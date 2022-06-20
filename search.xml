@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search> 
+  
+  
+    
+    <entry>
+      <title>vps2arch</title>
+      <link href="/posts/6c74fe8a.html"/>
+      <url>/posts/6c74fe8a.html</url>
+      
+        <content type="html"><![CDATA[<p>大部分 VPS 服务商一般不会提供 Archlinux 的服务器镜像，也不提供自定义镜像服务，但是你可以通过 vps2arch 将你的操作系统切换为 Archlinux。</p><blockquote><p>项目地址 : <a href="https://gitlab.com/drizzt/vps2arch">https://gitlab.com/drizzt/vps2arch</a></p></blockquote><h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p>使用 SSH 连接服务器，切换为 root 用户，执行以下代码</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">wget http://tinyurl.com/vps2arch</span><br><span class="line"><span class="built_in">chmod</span> +x vps2arch</span><br><span class="line">./vps2arch</span><br><span class="line"></span><br><span class="line"><span class="comment"># 帮助命令</span></span><br><span class="line">./vps2arch -h</span><br><span class="line"><span class="comment"># 自定义bootloader(grub/syslinux)，默认grub</span></span><br><span class="line">./vps2arch -b syslinux</span><br><span class="line"><span class="comment"># 自定义网络管理器(systemd-networkd|netctl),默认systemd-networkd</span></span><br><span class="line">./vps2arch -n netctl</span><br><span class="line"><span class="comment"># 自定义镜像（阿里云）</span></span><br><span class="line">./vps2arch -m https://mirrors.aliyun.com/archlinux</span><br><span class="line"><span class="comment"># 自定义镜像（腾讯云）</span></span><br><span class="line">./vps2arch -m https://mirrors.cloud.tencent.com/archlinux</span><br><span class="line"><span class="comment"># 自定义镜像（清华大学）</span></span><br><span class="line">./vps2arch -m https://mirrors.tuna.tsinghua.edu.cn/archlinux</span><br></pre></td></tr></table></figure><p>稍微等待几分钟会看到如下提示</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">When you are finished with your post-installation, you<span class="string">&#x27;ll need to reboot the VM the rough way:</span></span><br><span class="line"><span class="string">        # sync ; reboot -f</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Then you&#x27;</span>ll be able to connect to your VM using SSH and to login using your old root password (or <span class="string">&quot;vps2arch&quot;</span> <span class="keyword">if</span> you didn<span class="string">&#x27;t have a root password).</span></span><br></pre></td></tr></table></figure><p>这时需要你执行<code>sync ; reoot -f</code>来重启 VPS，重启完毕输入之前的 root 密码即可登录系统。到这里你的VPS的系统就成功切换为 Archlinux 了。</p><h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><blockquote><p>ArchWiki： <a href="https://wiki.archlinux.org/title/Installation_guide">https://wiki.archlinux.org/title/Installation_guide</a></p></blockquote><h4 id="时间设置"><a href="#时间设置" class="headerlink" title="时间设置"></a>时间设置</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用 ntp</span></span><br><span class="line">  timedatectl set-ntp <span class="literal">true</span></span><br><span class="line"><span class="comment"># 设置时区</span></span><br><span class="line"><span class="built_in">ln</span> -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime</span><br><span class="line">hwclock --systohc</span><br></pre></td></tr></table></figure><h4 id="设置中文"><a href="#设置中文" class="headerlink" title="设置中文"></a>设置中文</h4><p>编辑 <code>/etc/locale.gen</code> 在最前面添加（当然取消注释也是一样的）</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">en_GB.UTF-8 UTF-8</span><br><span class="line">zh_CN.UTF-8 UTF-8</span><br></pre></td></tr></table></figure><p>执行 <code>locale-gen</code>应用配置，设置默认语言</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cat</span> &lt;&lt; <span class="string">&quot;EOF&quot;</span> &gt; /etc/locale.conf</span><br><span class="line">LANG=en_US.UTF-8</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure><h4 id="添加-ArchLinuxCN-源"><a href="#添加-ArchLinuxCN-源" class="headerlink" title="添加 ArchLinuxCN 源"></a>添加 ArchLinuxCN 源</h4><p>编辑 <code>/etc/pacman.conf</code> ，在文件末尾添加</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[archlinuxcn]</span><br><span class="line">Server = https://mirrors.tuna.tsinghua.edu.cn/archlinuxcn/<span class="variable">$arch</span></span><br></pre></td></tr></table></figure><p>保存后执行</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pacman -Syy</span><br><span class="line">pacman -S archlinuxcn-keyring</span><br></pre></td></tr></table></figure><h4 id="添加用户"><a href="#添加用户" class="headerlink" title="添加用户"></a>添加用户</h4><p>将以下的 Aaron 修改为你的用户名</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd -m -G wheel Aaron</span><br></pre></td></tr></table></figure><blockquote><p>-m 参数代表自动创建用户的家目录，这个例子里是 <code>/home/Aaron</code></p><p>-G 参数意味着用户要加入一些个的附加组，这儿即 <code>wheel</code> 组</p></blockquote><p>设置用户密码</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">passwd Aaron</span><br></pre></td></tr></table></figure><p>在 Linux 中设置密码是不显示的，输入两次一样的密码会提示成功。</p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> Arch,Linux </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Hello Hexo!</title>
+      <link href="/posts/e716326b.html"/>
+      <url>/posts/e716326b.html</url>
+      
+        <content type="html"><![CDATA[<p>博客由<a href="https://typecho.org/">Typecho</a>换到了<a href="https://hexo.io/zh-cn/">Hexo</a>，主题也由原来的<a href="https://www.ihewro.com/archives/489/">Handsome</a>换到了<a href="https://github.com/probberechts/hexo-theme-cactus">Cactus🌵 </a>。</p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> Hexo </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+  
+  
+</search>
